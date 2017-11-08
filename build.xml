@@ -1,78 +1,58 @@
-<?xml version="1.0" encoding="utf-8"?>
-<project name="test" default="test" basedir=".">
- 
-       <!--配置基本属性-->
-       <property name="src" value="src"/>
-       <property name="build" value="build"/>
-       <property name="lib" value="lib" />
-       <property name="dist" value="dist"/>
-       <property name="classpath" location="${build}"/>
-      
-       <!--配置测试报告的属性-->
-       <property name="report"   value="report"/>
-       <property name="report.xml"  value="${report}/junit/xml"/>
-       <property name="report.html" value="${report}/junit/html"/>
- 
-       <!--配置运行时classpath-->
-       <path id="classpath.run">
-              <pathelement path="${classpath}"/>
-              <fileset dir="${lib}">
-                     <include name="*.jar"/>
-              </fileset>
-       </path>
- 
-  <!--配置测试时classpath-->
-       <path id="classpath.test">
-              <path refid="classpath.run"/>
-              <path location="${dist}/lib/test-${DSTAMP}.jar"/>
-       </path>
-      
-       <!--任务初始化-->
-       <target name="init" >
-              <tstamp/>
-              <delete dir="${build}"/>
-              <delete dir="${report}"/>
-              <delete dir="${dist}"/>
-              <delete file="${lib}/test-*.jar"/>
-              <mkdir dir="${build}"/>
-              <mkdir dir="${lib}"/>
-              <mkdir dir="${dist}"/>
-              <mkdir dir="${report}"/>
-       </target>
-      
-       <!--配置编译任务-->
-       <target name="compile" depends="init">
-              <javac srcdir="${src}" destdir="${build}">
-              <classpath refid="classpath.run" />
-              </javac>
-       </target>
-           
-       <!--配置运行任务-->
-       <target name="run" depends="compile, dist">
-         <java classname="com.test.TestCalculator">
-             <classpath>
-                     <path refid="classpath.run"/>
-              </classpath>
-         </java>
-       </target>
-      
-       <!--配置JUnit测试，打印测试结果-->
-       <target name="test" depends="compile, dist">
-              <mkdir dir="${report.xml}"/>
-              <mkdir dir="${report.html}"/>
-              <junit printsummary="yes" haltonfailure="no">
-                     <classpath refid="classpath.run"/>
-                     <formatter type="xml"/>
-                     <batchtest fork="yes" todir="${report.xml}">
-                            <fileset dir="${src}" includes="**/Test*.java"/>
-                     </batchtest>
-              </junit>
-              <junitreport todir="${report.html}">
-                     <fileset dir="${report.xml}">
-                            <include name="*.xml"/>
-                     </fileset>
-                     <report format="frames" todir="${report.html}"/>
-              </junitreport>
-       </target>
- 
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="mytest">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="C:/Users/Administrator/eclipse/jee-oxygen/eclipse/"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.8"/>
+    <property name="source" value="1.8"/>
+    <path id="Web App Libraries.libraryclasspath">
+        <pathelement location="WebContent/WEB-INF/lib/junit-4.12.jar"/>
+    </path>
+    <path id="EAR Libraries.libraryclasspath"/>
+    <path id="JUnit 3.libraryclasspath"/>
+    <path id="mytest.classpath">
+        <pathelement location="build/classes"/>
+        <path refid="Web App Libraries.libraryclasspath"/>
+        <path refid="EAR Libraries.libraryclasspath"/>
+        <path refid="JUnit 3.libraryclasspath"/>
+    </path>
+    <target name="init">
+        <mkdir dir="build/classes"/>
+        <copy includeemptydirs="false" todir="build/classes">
+            <fileset dir="src">
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="build/classes"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="build/classes" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="mytest.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
 </project>
